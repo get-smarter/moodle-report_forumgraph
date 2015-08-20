@@ -84,7 +84,6 @@ function report_forumgraph_get_category_courses($category_id, &$visible_courses,
     
     if ($category->coursecount > 0) {
         if ($courses = get_courses($category->id, 'c.sortorder ASC', 'c.id,c.sortorder,c.visible,c.fullname,c.shortname,c.summary')) {
-            $category->courses = array();
             foreach ($courses as $course) {
                 $context = context_course::instance($course->id);
                 if (has_capability('moodle/course:view', $context)) {
@@ -116,12 +115,8 @@ function report_forumgraph_get_forumoptions($cid) {
     if ($course = $DB->get_record('course', array('id'=>$cid))) {
         if ($forums = $DB->get_records('forum', array('course'=>$cid), 'id DESC')) {
             foreach ($forums as $forum) {
-                $cm = get_coursemodule_from_instance("forum", $forum->id, $cid);
-                $context = context_module::instance($cm->id);
-                if (has_capability('mod/forum:addinstance', $context)) {
-                    if ($DB->record_exists('forum_discussions', array('forum'=>$forum->id))) {
-                        $forumoptions[$forum->id] = $forum->name;
-                    }
+                if ($DB->record_exists('forum_discussions', array('forum'=>$forum->id))) {
+                    $forumoptions[$forum->id] = $forum->name;
                 }
             }
         } else {
