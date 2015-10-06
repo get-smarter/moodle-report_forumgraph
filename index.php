@@ -220,7 +220,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 		}
 	}
 
-	$npu_str = '';
+	$pu_str = '';
 	if ($discussions) {
 		$discussion_ids = array_keys($discussions);
 
@@ -232,23 +232,23 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 
 		// Get top 3 users who posted most
 		$limit = 10;
-		$mpus = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid ORDER BY postcount DESC LIMIT $limit", $in_params);
+		$pus = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid ORDER BY postcount DESC", $in_params);
 
-		if ($mpus) {
-			$npu_str .= '<ol id="topposters">';
-			foreach ($mpus as $mpu) {
+		if ($pus) {
+			$pu_str .= '<ol id="topposters">';
+			foreach ($pus as $pu) {
 				$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
-				$log_href .= $course . '&modid=' . $cm->id . '&user=' . $mpu->userid;
-				$postuser = $DB->get_record('user', array('id' => $mpu->userid));
-				$npu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($postuser) . "</a> ($mpu->postcount)</li>";
+				$log_href .= $course . '&modid=' . $cm->id . '&user=' . $pu->userid;
+				$postuser = $DB->get_record('user', array('id' => $pu->userid));
+				$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($postuser) . "</a> ($pu->postcount)</li>";
 			}
-			$lastuser = array_pop($mpus);
+			$lastuser = array_pop($pus);
 			$samenumpostuser = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid HAVING postcount = " . $lastuser->postcount, $in_params);
 			if ($samenumpostuser) {
-				$npu_str = substr($mpu_str, 0, -5) . " " . get_string('andotherusers', 'report_forumgraph', count($samenumpostuser)) . "</li>";
+				$pu_str = substr($pu_str, 0, -5) . " " . get_string('andotherusers', 'report_forumgraph', count($samenumpostuser)) . "</li>";
 			}
 
-			$mpu_str .= '</ol>';
+			$pu_str .= '</ol>';
 		}
 	}
 
@@ -271,9 +271,39 @@ where c.id = $course");
 	$count = count($enrolled);
 
 	echo "There are $enrolled users in course 51 and enrolled is $count";
-	echo "There are $nopostuser";
-	var_dump($nopostuser);
+	// print_r($enrolled);
+	echo "postrrrrr";
+	// $pus = $DB->get_record('user', array('id' => $pu->userid));
+	//
+	// echo "string";
+	// echo $postuser;
+	// var_dump($postuser);
+	// print_r(fullname($pus));
+	// print_r(array_keys(($enrolled));
+	echo "\nstring";
+// $egy = get_enrolled_sql(context $context, $withcapability = '', $groupid = 0, $onlyactive = false)
+	$context = context_course::instance($course);
 
+	$role = $DB->get_record('role', array('shortname' => 'student'));
+
+	$users = get_role_users($role->id, $context);
+
+	$user_ids = join(',', array_keys($users));
+	// array_keys($users)
+	// print_r($user_ids);
+	print_r(array_keys($users));
+	$userskey = array_keys($users);
+	// $nopost = array_diff($users, $pus);
+	// $nopostk = array_diff_key($users, $pus);
+	// $ketto = get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = '', $limitfrom = 0, $limitnum = 0)
+	// print_r($egy);
+	// echo "string";
+	// print_r($ketto);
+
+	// error_log(array_keys($enrolled));
+	// error_log($enrolled);
+	// $userswithoutpost = array_diff($enrolled, $pus)
+	// print_r($userswithoutpost);
 	// Table showing some important information and statisitic for the selected forum
 	$summarytable = new html_table();
 	$summarytable->size = array('25%', '75%');
@@ -303,7 +333,7 @@ where c.id = $course");
 	$cell7 = new html_table_cell();
 	$cell7->text = get_string('mostpostuser', 'report_forumgraph');
 	$cell8 = new html_table_cell();
-	$cell8->text = $npu_str;
+	$cell8->text = $pu_str;
 	$row4 = new html_table_row();
 	$row4->cells = array($cell7, $cell8);
 
@@ -324,4 +354,11 @@ $js_wwwroot = $CFG->wwwroot;
 
 $PAGE->requires->js_init_call('M.report_forumgraph.init', array($js_forum, $js_cmid, $js_course, $js_wwwroot));
 
+$pus = $DB->get_records_sql("SELECT userid FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid DESC", $in_params);
+print_r(array_keys($pus));
+$puskey = array_keys($pus);
+echo "string";
+print_r(array_diff($userskey, $puskey));
+
+// print_r($pus);
 echo $OUTPUT->footer();
