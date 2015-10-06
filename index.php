@@ -258,15 +258,15 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 
 	$enrolled = $DB->get_records_sql("
 
-SELECT c.id, u.id, u.firstname, u.lastname
+		SELECT c.id, u.id, u.firstname, u.lastname
 
-FROM {course} c
-JOIN {context} ct ON c.id = ct.instanceid
-JOIN {role_assignments} ra ON ra.contextid = ct.id
-JOIN {user} u ON u.id = ra.userid
-JOIN {role} r ON r.id = ra.roleid
+		FROM {course} c
+		JOIN {context} ct ON c.id = ct.instanceid
+		JOIN {role_assignments} ra ON ra.contextid = ct.id
+		JOIN {user} u ON u.id = ra.userid
+		JOIN {role} r ON r.id = ra.roleid
 
-where c.id = $course");
+		where c.id = $course");
 
 	$count = count($enrolled);
 
@@ -293,15 +293,12 @@ where c.id = $course");
 	$pus = $DB->get_records_sql("SELECT userid FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid DESC", $in_params);
 	$puskey = array_keys($pus);
 	$nopostusers = (array_diff($userskey, $puskey));
-	print_r($nopostusers);
-	var_dump($nopostusers);
-	print_r(array_values($nopostusers));
 
 	$pu_str = '';
 	foreach ($nopostusers as $key => $value) {
 		$mpu_str .= '<ol id="topposters">';
 		$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
-		$log_href .= $course . '&modid=' . $course . '&user=' . $value;
+		$log_href .= $course . '&modid=' . $cm->id . '&user=' . $value;
 		$npu = $DB->get_record('user', array('id' => $value));
 		$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($npu) . "</a> </li>";
 	}
@@ -344,7 +341,7 @@ where c.id = $course");
 	$row3->cells = array($cell5, $cell6);
 
 	$cell7 = new html_table_cell();
-	$cell7->text = get_string('mostpostuser', 'report_forumgraph');
+	$cell7->text = get_string('nopostuser', 'report_forumgraph');
 	$cell8 = new html_table_cell();
 	$cell8->text = $pu_str;
 	$row4 = new html_table_row();
