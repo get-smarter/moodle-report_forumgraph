@@ -220,37 +220,37 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 		}
 	}
 
-	$pu_str = '';
-	if ($discussions) {
-		$discussion_ids = array_keys($discussions);
+	// $pu_str = '';
+	// if ($discussions) {
+	// 	$discussion_ids = array_keys($discussions);
 
-		// Get total no. of replies in forum
-		$query_params = array('parent' => 0);
-		list($in_sql, $in_params) = $DB->get_in_or_equal($discussion_ids, SQL_PARAMS_NAMED);
-		$params = array_merge($in_params, $query_params);
-		$replies_count = $DB->count_records_sql("SELECT COUNT(*) FROM {forum_posts} WHERE discussion $in_sql AND parent <> :parent", $params);
+	// 	// Get total no. of replies in forum
+	// 	$query_params = array('parent' => 0);
+	// 	list($in_sql, $in_params) = $DB->get_in_or_equal($discussion_ids, SQL_PARAMS_NAMED);
+	// 	$params = array_merge($in_params, $query_params);
+	// 	$replies_count = $DB->count_records_sql("SELECT COUNT(*) FROM {forum_posts} WHERE discussion $in_sql AND parent <> :parent", $params);
 
-		// Get top 3 users who posted most
-		$limit = 10;
-		$pus = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid ORDER BY postcount DESC", $in_params);
+	// 	// Get top 3 users who posted most
+	// 	$limit = 10;
+	// 	$pus = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid ORDER BY postcount DESC", $in_params);
 
-		if ($pus) {
-			$pu_str .= '<ol id="topposters">';
-			foreach ($pus as $pu) {
-				$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
-				$log_href .= $course . '&modid=' . $cm->id . '&user=' . $pu->userid;
-				$postuser = $DB->get_record('user', array('id' => $pu->userid));
-				$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($postuser) . "</a> ($pu->postcount)</li>";
-			}
-			$lastuser = array_pop($pus);
-			$samenumpostuser = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid HAVING postcount = " . $lastuser->postcount, $in_params);
-			if ($samenumpostuser) {
-				$pu_str = substr($pu_str, 0, -5) . " " . get_string('andotherusers', 'report_forumgraph', count($samenumpostuser)) . "</li>";
-			}
+	// 	if ($pus) {
+	// 		$pu_str .= '<ol id="topposters">';
+	// 		foreach ($pus as $pu) {
+	// 			$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
+	// 			$log_href .= $course . '&modid=' . $cm->id . '&user=' . $pu->userid;
+	// 			$postuser = $DB->get_record('user', array('id' => $pu->userid));
+	// 			$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($postuser) . "</a> ($pu->postcount)</li>";
+	// 		}
+	// 		$lastuser = array_pop($pus);
+	// 		$samenumpostuser = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid HAVING postcount = " . $lastuser->postcount, $in_params);
+	// 		if ($samenumpostuser) {
+	// 			$pu_str = substr($pu_str, 0, -5) . " " . get_string('andotherusers', 'report_forumgraph', count($samenumpostuser)) . "</li>";
+	// 		}
 
-			$pu_str .= '</ol>';
-		}
-	}
+	// 		$pu_str .= '</ol>';
+	// 	}
+	// }
 
 	// Get top 3 discussion with most replies
 
@@ -297,6 +297,15 @@ where c.id = $course");
 	var_dump($nopostusers);
 	print_r(array_values($nopostusers));
 
+	$pu_str = '';
+	foreach ($nopostusers as $key => $value) {
+		$mpu_str .= '<ol id="topposters">';
+		$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
+		$log_href .= $course . '&modid=' . $course . '&user=' . $value;
+		$npu = $DB->get_record('user', array('id' => $value));
+		$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($npu) . "</a> </li>";
+	}
+	$pu_str .= '</ol>';
 	// $nopost = array_diff($users, $pus);
 	// $nopostk = array_diff_key($users, $pus);
 	// $ketto = get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = '', $limitfrom = 0, $limitnum = 0)
