@@ -270,9 +270,7 @@ where c.id = $course");
 
 	$count = count($enrolled);
 
-	echo "There are $enrolled users in course 51 and enrolled is $count";
 	// print_r($enrolled);
-	echo "postrrrrr";
 	// $pus = $DB->get_record('user', array('id' => $pu->userid));
 	//
 	// echo "string";
@@ -280,8 +278,7 @@ where c.id = $course");
 	// var_dump($postuser);
 	// print_r(fullname($pus));
 	// print_r(array_keys(($enrolled));
-	echo "\nstring";
-// $egy = get_enrolled_sql(context $context, $withcapability = '', $groupid = 0, $onlyactive = false)
+	// $egy = get_enrolled_sql(context $context, $withcapability = '', $groupid = 0, $onlyactive = false)
 	$context = context_course::instance($course);
 
 	$role = $DB->get_record('role', array('shortname' => 'student'));
@@ -291,8 +288,15 @@ where c.id = $course");
 	$user_ids = join(',', array_keys($users));
 	// array_keys($users)
 	// print_r($user_ids);
-	print_r(array_keys($users));
 	$userskey = array_keys($users);
+
+	$pus = $DB->get_records_sql("SELECT userid FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid DESC", $in_params);
+	$puskey = array_keys($pus);
+	$nopostusers = (array_diff($userskey, $puskey));
+	print_r($nopostusers);
+	var_dump($nopostusers);
+	print_r(array_values($nopostusers));
+
 	// $nopost = array_diff($users, $pus);
 	// $nopostk = array_diff_key($users, $pus);
 	// $ketto = get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = '', $limitfrom = 0, $limitnum = 0)
@@ -354,11 +358,4 @@ $js_wwwroot = $CFG->wwwroot;
 
 $PAGE->requires->js_init_call('M.report_forumgraph.init', array($js_forum, $js_cmid, $js_course, $js_wwwroot));
 
-$pus = $DB->get_records_sql("SELECT userid FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid DESC", $in_params);
-print_r(array_keys($pus));
-$puskey = array_keys($pus);
-echo "string";
-print_r(array_diff($userskey, $puskey));
-
-// print_r($pus);
 echo $OUTPUT->footer();
