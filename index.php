@@ -220,65 +220,6 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 		}
 	}
 
-	// $pu_str = '';
-	// if ($discussions) {
-	// 	$discussion_ids = array_keys($discussions);
-
-	// 	// Get total no. of replies in forum
-	// 	$query_params = array('parent' => 0);
-	// 	list($in_sql, $in_params) = $DB->get_in_or_equal($discussion_ids, SQL_PARAMS_NAMED);
-	// 	$params = array_merge($in_params, $query_params);
-	// 	$replies_count = $DB->count_records_sql("SELECT COUNT(*) FROM {forum_posts} WHERE discussion $in_sql AND parent <> :parent", $params);
-
-	// 	// Get top 3 users who posted most
-	// 	$limit = 10;
-	// 	$pus = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid ORDER BY postcount DESC", $in_params);
-
-	// 	if ($pus) {
-	// 		$pu_str .= '<ol id="topposters">';
-	// 		foreach ($pus as $pu) {
-	// 			$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
-	// 			$log_href .= $course . '&modid=' . $cm->id . '&user=' . $pu->userid;
-	// 			$postuser = $DB->get_record('user', array('id' => $pu->userid));
-	// 			$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($postuser) . "</a> ($pu->postcount)</li>";
-	// 		}
-	// 		$lastuser = array_pop($pus);
-	// 		$samenumpostuser = $DB->get_records_sql("SELECT userid, COUNT(fp.userid) AS postcount FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid HAVING postcount = " . $lastuser->postcount, $in_params);
-	// 		if ($samenumpostuser) {
-	// 			$pu_str = substr($pu_str, 0, -5) . " " . get_string('andotherusers', 'report_forumgraph', count($samenumpostuser)) . "</li>";
-	// 		}
-
-	// 		$pu_str .= '</ol>';
-	// 	}
-	// }
-
-	// Get top 3 discussion with most replies
-
-	global $DB;
-
-	$enrolled = $DB->get_records_sql("
-
-		SELECT c.id, u.id, u.firstname, u.lastname
-
-		FROM {course} c
-		JOIN {context} ct ON c.id = ct.instanceid
-		JOIN {role_assignments} ra ON ra.contextid = ct.id
-		JOIN {user} u ON u.id = ra.userid
-		JOIN {role} r ON r.id = ra.roleid
-
-		where c.id = $course");
-
-	$count = count($enrolled);
-
-	// print_r($enrolled);
-	// $pus = $DB->get_record('user', array('id' => $pu->userid));
-	//
-	// echo "string";
-	// echo $postuser;
-	// var_dump($postuser);
-	// print_r(fullname($pus));
-	// print_r(array_keys(($enrolled));
-	// $egy = get_enrolled_sql(context $context, $withcapability = '', $groupid = 0, $onlyactive = false)
 	$context = context_course::instance($course);
 
 	$role = $DB->get_record('role', array('shortname' => 'student'));
@@ -286,14 +227,12 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 	$users = get_role_users($role->id, $context);
 
 	$user_ids = join(',', array_keys($users));
-	// array_keys($users)
-	// print_r($user_ids);
 	$userskey = array_keys($users);
 
 	$pus = $DB->get_records_sql("SELECT userid FROM {forum_posts} fp WHERE discussion $in_sql GROUP BY fp.userid DESC", $in_params);
 	$puskey = array_keys($pus);
 	$nopostusers = (array_diff($userskey, $puskey));
-
+	//list all users without post for modal window
 	$pu_str = '';
 	$pu_str .= '<ol id="topposters">';
 	foreach ($nopostusers as $key => $value) {
@@ -303,7 +242,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 		$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($npu) . "</a> </li>";
 	}
 	$pu_str .= '</ol>';
-
+	// list 10 users without post
 	$pu_str3 = '';
 	$pu_str3 .= '<ol id="topposters">';
 	$i = 0;
@@ -319,16 +258,17 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 
 	}
 	$count = count($nopostusers);
+	$countdiff = count($nopostusers) - 10;
 	// echo "$count other users...";
 	$modal = '<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
             <h4 class="modal-title" id="myModalLabel">Users without post</h4>
             </div>
             <div class="modal-body">
-                <h3>' . $pu_str . '</h3>
+                <h6>' . $pu_str . '</h4>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -338,20 +278,10 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 </div>
 ';
 	echo $modal;
-	$pu_str3 .= '<a href="#" class="btn btn-sm btn-success"
+	$pu_str3 .= '<a href="#"
    data-toggle="modal"
-   data-target="#basicModal">Show all</a></ol>';
-	// $nopost = array_diff($users, $pus);
-	// $nopostk = array_diff_key($users, $pus);
-	// $ketto = get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = '', $limitfrom = 0, $limitnum = 0)
-	// print_r($egy);
-	// echo "string";
-	// print_r($ketto);
+   data-target="#basicModal">... and ' . $countdiff . ' others</a></ol>';
 
-	// error_log(array_keys($enrolled));
-	// error_log($enrolled);
-	// $userswithoutpost = array_diff($enrolled, $pus)
-	// print_r($userswithoutpost);
 	// Table showing some important information and statisitic for the selected forum
 	$summarytable = new html_table();
 	$summarytable->size = array('25%', '75%');
