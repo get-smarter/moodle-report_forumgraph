@@ -297,13 +297,50 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 	$pu_str = '';
 	$pu_str .= '<ol id="topposters">';
 	foreach ($nopostusers as $key => $value) {
-		$mpu_str .= '<ol id="topposters">';
 		$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
 		$log_href .= $course . '&modid=' . $cm->id . '&user=' . $value;
 		$npu = $DB->get_record('user', array('id' => $value));
 		$pu_str .= "<li><a href='$log_href' target='_blank'>" . fullname($npu) . "</a> </li>";
 	}
 	$pu_str .= '</ol>';
+
+	$pu_str3 = '';
+	$pu_str3 .= '<ol id="topposters">';
+	$i = 0;
+	foreach ($nopostusers as $key => $value) {
+		$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
+		$log_href .= $course . '&modid=' . $cm->id . '&user=' . $value;
+		$npu3 = $DB->get_record('user', array('id' => $value));
+		$pu_str3 .= "<li><a href='$log_href' target='_blank'>" . fullname($npu3) . "</a> </li>";
+		$i++;
+		if ($i == 10) {
+			break;
+		}
+
+	}
+	// $count = count($nopostusers) - 10;
+	// echo "$count other users...";
+	$modal = '<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+            <h4 class="modal-title" id="myModalLabel">Users without post</h4>
+            </div>
+            <div class="modal-body">
+                <h3>' . $pu_str . '</h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+  </div>
+</div>
+';
+	echo $modal;
+	$pu_str3 .= '<a href="#" class="btn btn-lg btn-success"
+   data-toggle="modal"
+   data-target="#basicModal">Click to open Modal</a></ol>';
 	// $nopost = array_diff($users, $pus);
 	// $nopostk = array_diff_key($users, $pus);
 	// $ketto = get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = '', $limitfrom = 0, $limitnum = 0)
@@ -344,7 +381,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 	$cell7 = new html_table_cell();
 	$cell7->text = get_string('nopostuser', 'report_forumgraph');
 	$cell8 = new html_table_cell();
-	$cell8->text = $pu_str;
+	$cell8->text = $pu_str3;
 	$row4 = new html_table_row();
 	$row4->cells = array($cell7, $cell8);
 
