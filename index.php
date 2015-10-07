@@ -318,7 +318,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 		}
 
 	}
-	// $count = count($nopostusers) - 10;
+	$count = count($nopostusers);
 	// echo "$count other users...";
 	$modal = '<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog">
@@ -338,9 +338,9 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 </div>
 ';
 	echo $modal;
-	$pu_str3 .= '<a href="#" class="btn btn-lg btn-success"
+	$pu_str3 .= '<a href="#" class="btn btn-sm btn-success"
    data-toggle="modal"
-   data-target="#basicModal">Click to open Modal</a></ol>';
+   data-target="#basicModal">Show all</a></ol>';
 	// $nopost = array_diff($users, $pus);
 	// $nopostk = array_diff_key($users, $pus);
 	// $ketto = get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = '', $limitfrom = 0, $limitnum = 0)
@@ -379,7 +379,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 	$row3->cells = array($cell5, $cell6);
 
 	$cell7 = new html_table_cell();
-	$cell7->text = get_string('nopostuser', 'report_forumgraph');
+	$cell7->text = $count . ' Users without post';
 	$cell8 = new html_table_cell();
 	$cell8->text = $pu_str3;
 	$row4 = new html_table_row();
