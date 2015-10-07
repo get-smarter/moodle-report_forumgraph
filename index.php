@@ -295,6 +295,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
 	$nopostusers = (array_diff($userskey, $puskey));
 
 	$pu_str = '';
+	$pu_str .= '<ol id="topposters">';
 	foreach ($nopostusers as $key => $value) {
 		$mpu_str .= '<ol id="topposters">';
 		$log_href = $CFG->wwwroot . '/report/log/index.php?chooselog=1&showusers=1&showcourses=1&date=0&modaction=add&logformat=showashtml&host_course=1%2F';
