@@ -39,6 +39,7 @@ $string['usercount'] = 'User count';
 $string['allcourses'] = 'All courses';
 $string['usertype'] = 'Users';
 $string['mostpostuser'] = 'User with most posts';
+$string['nopostuser'] = 'Users without posts';
 $string['andotherusers'] = 'and other {$a} users';
 
 $string['noforumincourse'] = 'No forum in course';
