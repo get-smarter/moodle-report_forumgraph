@@ -248,7 +248,7 @@ if (!empty($school) && !empty($course) && !empty($forum)) {
         }
     }
     $count = count($no_post_users);
-    $countdiff = count($no_post_users) - 10;
+    $countdiff = count($no_post_users) - $i;
     $modal = '
 <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog">
